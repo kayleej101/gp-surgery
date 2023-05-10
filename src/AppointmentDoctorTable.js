@@ -1,43 +1,56 @@
 import React, { useState, useEffect } from 'react';
 
-// view notes function
-const handleNotes = (id) => {
-    fetch(`/api/appointments/${id}/notes`)
-      .then(response => response.json())
-      .then(data => {
-        // Display appointment notes in a modal or overlay on the screen
-        console.log(`Notes for appointment ${id}: ${data.notes}`);
-      })
-      .catch(error => console.error(error));
-  };
+function AppointmentDoctorTable({doctorName}) {
+    const [appointments, setAppointments] = useState([]);
+
+    useEffect(() => {
+        {/* fetch the apppointments assigned with specified doctorName */}
+        fetch(`/api/appointments?doctor=${doctorName}`)
+        .then(response => response.json())
+        .then(data => setAppointments(data))
+        .catch(error => console.error(error));
+    }, [doctorName]);
+
+
+    // view notes
+    const handleNotes = (appointmentNumber) => {
+        fetch(`/api/appointments/${appointmentNumber}/notes`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(`Notes for appointment ${appointmentNumber}: ${data.notes}`);
+        })
+        .catch(error => console.error(error));
+    };
   
-return (
-    <table class="govuk-table">
-        <thead class="govuk-table__head">
-            <tr class="govuk-table__row">
-                <th scope="col" class="govuk-table__header">Appointment ID</th>
-                <th scope="col" class="govuk-table__header">Date</th>
-                <th scope="col" class="govuk-table__header">Time</th>
-                <th scope="col" class="govuk-table__header">Patient</th>
-                <th scope="col" class="govuk-table__header">Doctor</th>
-            </tr>
-        </thead>
-        <tbody class="govuk-table__body">
-            {/* it takes information from the array to display in the table */}
-            {AppointmentTable.map(appointment =>(
-                //key is taking everything from the specific id
-                <tr class="govuk-table__row" key={appointment.id}>
-                    <td class="govuk-table__cell">{appointment.id}</td>
-                    <td class="govuk-table__cell">{appointment.date}</td>
-                    <td class="govuk-table__cell">{appointment.date}</td>
-                    <td class="govuk-table__cell">{appointment.time}</td>
-                    <td class="govuk-table__cell">{appointment.patientName}</td>
-                    <td class="govuk-table__cell">{appointment.doctorName}</td>
-                    <td class="govuk-table__cell">
-                        <button class="govuk-button" onClick={() => handleNotes(appointment.id)}>Appointment Notes</button>
-                    </td>
+    return (
+        <table className="govuk-table">
+            <thead className="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" className="govuk-table__header">Appointment Number</th>
+                    <th scope="col" className="govuk-table__header">Date</th>
+                    <th scope="col" className="govuk-table__header">Time</th>
+                    <th scope="col" className="govuk-table__header">Patient</th>
+                    <th scope="col" className="govuk-table__header">Doctor</th>
                 </tr>
-            ))}
-        </tbody>
-    </table>
-)
+            </thead>
+            <tbody className="govuk-table__body">
+                {/* it takes information from the array to display in the table */}
+                {appointments.map(appointment =>(
+                    // 'key' is taking everything from the specific appointmentNumber*
+                    <tr className="govuk-table__row" key={appointment.appointmentNumber}>
+                        <td className="govuk-table__cell">{appointment.appointmentNumber}</td>
+                        <td className="govuk-table__cell">{appointment.date}</td>
+                        <td className="govuk-table__cell">{appointment.time}</td>
+                        <td className="govuk-table__cell">{appointment.patientName}</td>
+                        <td className="govuk-table__cell">{appointment.doctorName}</td>
+                        <td className="govuk-table__cell">
+                            {/* when clicked the appointment notes for that appointmentNumber will display */}
+                            <button className="govuk-button" onClick={() => handleNotes(appointment.appointmentNumber)}>View Notes</button>
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    )
+}
+export default AppointmentDoctorTable;
